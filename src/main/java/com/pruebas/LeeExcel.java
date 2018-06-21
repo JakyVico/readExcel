@@ -37,7 +37,7 @@ public class LeeExcel {
             System.out.println("resultado de macro"+res);
             
             
-            for(int i=0; i<numSheet; i++){
+            for(int i=0; i<numSheet-1; i++){
                 
                 System.out.println();
                 System.out.println("contador: "+i);
@@ -114,7 +114,7 @@ public class LeeExcel {
               try {
             if(f.exists()){
             LeeExcel obj= new LeeExcel(f);
-            System.out.println("pase por aqui ");
+            //System.out.println("pase por aqui ");
         }
         } catch (Exception e) {
             e.printStackTrace();
