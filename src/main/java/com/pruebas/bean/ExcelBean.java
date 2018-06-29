@@ -3,14 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.pruebas;
+package com.pruebas.bean;
 
 /**
  *
  * @author VS1XFI7
  */
-public class NOTAS {
-    
-    /*vERSION DEL FORMATO ES 97 A 2003 DE EXCEL*/
+public class ExcelBean {
     
 }
