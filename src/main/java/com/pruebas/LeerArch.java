@@ -23,14 +23,13 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_BLANK;
+import org.apache.poi.util.ArrayUtil;
 
 /**
  *
  * @author VS1XFI7
  */
 public class LeerArch {
-
-    
 
     String nameSheetTwo;
     String nameSheetOne;
@@ -44,17 +43,19 @@ public class LeerArch {
     private static Date fechaElab;
     private static String tipoCargo, carcProd;
     private static List<String> validList;
+    private static List<String> valoresAprovisionamiento;
 
     public static void main(String[] args) {
         LeerArch readXls = new LeerArch();
         //readXls.readXLSFile("C:/Users/VS1XFI7/Desktop/JAQUE/Formatos/Productos/producRevision.xls");
         readXls.readXLSFile("C:/Users/VS1XFI7/Desktop/JAQUE/Formatos/Productos/validacionp.xls");
         System.out.println(HEADER_PRODUCT + "  Esto es el header");
-        System.out.println(REGIONES + "regiones");
-        System.out.println(PRODUCTO + " productos");
-        System.out.println(NAMESHEET + " nombres");
-        System.out.println(datosC1 + " datos c1");
+        // System.out.println(REGIONES + "regiones");
+        //System.out.println(PRODUCTO + " productos");
+        //System.out.println(NAMESHEET + " nombres");
+        //System.out.println(datosC1 + " datos c1");
 
+//        System.out.println("aaaa" + validList + "listasssssss");
     }
 
     public void readXLSFile(String fileName) {
@@ -87,11 +88,10 @@ public class LeerArch {
             while (rows.hasNext()) {
                 row = (HSSFRow) rows.next();
                 Iterator cells = row.cellIterator();
-
                 while (cells.hasNext()) {
                     cell = (HSSFCell) cells.next();
                     //validaPlan(cell);
-                    validRules(cell);
+                    readFormat(cell);
                 }
                 try {
                     ExcelFileToRead.close();
@@ -102,25 +102,109 @@ public class LeerArch {
         }
     }
 
-    public static void validRules(HSSFCell cell) {
-        
+    //metodo agrgar a las listas los headers 
+    public static void readFormat(HSSFCell cell) {
+
         int fila = cell.getRowIndex();
         int colum = cell.getColumnIndex();
 
-        if (fila == 9) {
-            validList = generaLista();
-            validList.add(cell.getStringCellValue());
-        }else if(fila >=10){
-           //vaciarProduc(validList);
-            //System.out.println("listaaa size:  "+validList.size()); ;
-            validList.add(cell.getStringCellValue());
-            
+        //Validacion para productos hoja uno:::::::::::::::::::::::::::::::::::::::::
+        if (NAMESHEET.size() == 1) {
+            //System.out.println("Hoja uno:::::::::" + NAMESHEET.get(0));
+            if(NAMESHEET.get(0).equalsIgnoreCase("Formato")){
+                if (fila == 9) {
+                validList = generaLista();
+                // validList.add(cell.getStringCellValue());
+                //System.out.println(validList + "Lista generada");
+                HEADER_PRODUCT.add(cell.getStringCellValue());
+                //System.out.println("header"+HEADER_PRODUCT);
+            } else if (fila >= 10) {              
+                 if(validList.size()<HEADER_PRODUCT.size()){
+                     validList.add(cell.getStringCellValue());
+                    // System.out.println("HEADER SIZEEE"+HEADER_PRODUCT.size());
+                     // System.out.println("Daata"+validList.size());
+                     // System.out.println("Daata"+validList);
+                 }else{
+                     validaDatos(validList); 
+                     validList = generaLista();
+                     validList.add(cell.getStringCellValue());
+                 }
+             }
+               
+            }
         }
 
-        System.out.println(validList + "Nueva Lista");
+   /*
+   //Validar hoja dos 
+        if(NAMESHEET.size()==2 && NAMESHEET.get(1).equalsIgnoreCase("Aprovisionamiento")){
+                //System.err.println(NAMESHEET+"  nam");
+                //System.err.println("datosss  "+cell.getStringCellValue()+" Fila: "+fila+" Columna: "+colum);
+            if (fila == 1) {
+                validList = generaLista();
+                // validList.add(cell.getStringCellValue());
+                //System.out.println(validList + "Lista generada");
+                HEADER_PRODUCT.add(cell.getStringCellValue());
+                //System.out.println("header"+HEADER_PRODUCT);
+            } else if (fila >= 1) {              
+                 if(validList.size()<HEADER_PRODUCT.size()){
+                     validList.add(cell.getStringCellValue());
+                     System.out.println("HEADER SIZEEE"+HEADER_PRODUCT.size());
+                      System.out.println("Daata"+validList.size());
+                      System.out.println("Daata"+validList);
+                 }else{
+                     validaDatos(validList);
+                     validList = generaLista();
+                     validList.add(cell.getStringCellValue());
+                 }
+            }
+                
+            if (fila == 8) {
+                validList = generaLista();
+                // validList.add(cell.getStringCellValue());
+                //System.out.println(validList + "Lista generada");
+                HEADER_PRODUCT.add(cell.getStringCellValue());
+                //System.out.println("header"+HEADER_PRODUCT);
+            } else if (fila >= 8) {              
+                 if(validList.size()<HEADER_PRODUCT.size()){
+                     validList.add(cell.getStringCellValue());
+                     System.out.println("HEADER SIZEEE"+HEADER_PRODUCT.size());
+                      System.out.println("Daata"+validList.size());
+                      System.out.println("Daata"+validList);
+                 }else{
+                     validaDatos(validList);
+                     validList = generaLista();
+                     validList.add(cell.getStringCellValue());
+                 }
+            }
+        }*/
+        
+        
     }
-    
-  
+
+    private static void validaDatos(List<String> validList1) {
+        //System.err.println(HEADER_PRODUCT+"header");
+        //System.err.println(HEADER_PRODUCT.size()+"tam");
+        /*System.err.println(validList1+"Lista de datos");
+        System.err.println(HEADER_PRODUCT+"Lista de cabecera");
+        System.err.println(HEADER_PRODUCT.size()+"sixe");*/
+ /*
+        if (validList1.size() <= HEADER_PRODUCT.size()) {
+            System.err.println(validList1 + "Lista de datos  " + validList1.size() + "  size");
+            System.err.println(HEADER_PRODUCT + "Lista de cabecera");
+            
+        }*/
+ System.err.println("header"+HEADER_PRODUCT);
+          if(validList1.get(0).isEmpty()){
+            System.err.println("No tiene dato principal");
+        }else{
+            System.out.println("list:::::::::::::::::" + validList); 
+              
+       
+        }
+        
+       
+    }
+
     //metodo generar n listas para la validacion
     public static List<String> generaLista() {
         return new ArrayList<String>();
