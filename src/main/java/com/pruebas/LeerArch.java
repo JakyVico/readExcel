@@ -49,13 +49,14 @@ public class LeerArch {
         LeerArch readXls = new LeerArch();
         //readXls.readXLSFile("C:/Users/VS1XFI7/Desktop/JAQUE/Formatos/Productos/producRevision.xls");
         readXls.readXLSFile("C:/Users/VS1XFI7/Desktop/JAQUE/Formatos/Productos/validacionp.xls");
-        System.out.println(HEADER_PRODUCT + "  Esto es el header");
-        // System.out.println(REGIONES + "regiones");
+        //System.out.println(HEADER_PRODUCT + "  Esto es el header");
+        //System.out.println(REGIONES + "regiones");
         //System.out.println(PRODUCTO + " productos");
         //System.out.println(NAMESHEET + " nombres");
         //System.out.println(datosC1 + " datos c1");
-
-//        System.out.println("aaaa" + validList + "listasssssss");
+        //System.out.println("aaaa" + validList + "listasssssss");
+      
+       
     }
 
     public void readXLSFile(String fileName) {
@@ -104,37 +105,34 @@ public class LeerArch {
 
     //metodo agrgar a las listas los headers 
     public static void readFormat(HSSFCell cell) {
-
         int fila = cell.getRowIndex();
         int colum = cell.getColumnIndex();
-
         //Validacion para productos hoja uno:::::::::::::::::::::::::::::::::::::::::
         if (NAMESHEET.size() == 1) {
-            //System.out.println("Hoja uno:::::::::" + NAMESHEET.get(0));
-            if(NAMESHEET.get(0).equalsIgnoreCase("Formato")){
+            if (NAMESHEET.get(0).equalsIgnoreCase("Formato")) {
                 if (fila == 9) {
-                validList = generaLista();
-                // validList.add(cell.getStringCellValue());
-                //System.out.println(validList + "Lista generada");
-                HEADER_PRODUCT.add(cell.getStringCellValue());
-                //System.out.println("header"+HEADER_PRODUCT);
-            } else if (fila >= 10) {              
-                 if(validList.size()<HEADER_PRODUCT.size()){
-                     validList.add(cell.getStringCellValue());
-                    // System.out.println("HEADER SIZEEE"+HEADER_PRODUCT.size());
-                     // System.out.println("Daata"+validList.size());
-                     // System.out.println("Daata"+validList);
-                 }else{
-                     validaDatos(validList); 
-                     validList = generaLista();
-                     validList.add(cell.getStringCellValue());
-                 }
-             }
-               
+                    validList = generaLista();
+                    // validList.add(cell.getStringCellValue());
+                    //System.out.println(validList + "Lista generada");
+                    HEADER_PRODUCT.add(cell.getStringCellValue());
+                    //System.out.println("header"+HEADER_PRODUCT);
+                } else if (fila >= 10) {
+                    if (validList.size() < HEADER_PRODUCT.size()) {
+                        validList.add(cell.getStringCellValue());
+                        // System.out.println("HEADER SIZEEE"+HEADER_PRODUCT.size());
+                        // System.out.println("Daata"+validList.size());
+                        // System.out.println("Daata"+validList);
+                    } else {
+                        validaDatos(validList);
+                        validList = generaLista();
+                        validList.add(cell.getStringCellValue());
+                    }
+                }
+
             }
         }
 
-   /*
+        /*
    //Validar hoja dos 
         if(NAMESHEET.size()==2 && NAMESHEET.get(1).equalsIgnoreCase("Aprovisionamiento")){
                 //System.err.println(NAMESHEET+"  nam");
@@ -177,35 +175,106 @@ public class LeerArch {
                  }
             }
         }*/
-        
-        
     }
 
     private static void validaDatos(List<String> validList1) {
-        //System.err.println(HEADER_PRODUCT+"header");
-        //System.err.println(HEADER_PRODUCT.size()+"tam");
-        /*System.err.println(validList1+"Lista de datos");
-        System.err.println(HEADER_PRODUCT+"Lista de cabecera");
-        System.err.println(HEADER_PRODUCT.size()+"sixe");*/
- /*
-        if (validList1.size() <= HEADER_PRODUCT.size()) {
-            System.err.println(validList1 + "Lista de datos  " + validList1.size() + "  size");
-            System.err.println(HEADER_PRODUCT + "Lista de cabecera");
-            
-        }*/
- System.err.println("header"+HEADER_PRODUCT);
-          if(validList1.get(0).isEmpty()){
-            System.err.println("No tiene dato principal");
-        }else{
-            System.out.println("list:::::::::::::::::" + validList); 
-              
-       
-        }
         
-       
+        String dato="PRORRATEO X(1)";
+        int position=convierteDatoToPosicion(dato) ;
+        
+        //System.err.println("header"+HEADER_PRODUCT);
+        if (validList1.get(0).isEmpty()) {
+            //  System.err.println("No tiene dato principal");
+        } else {
+            //System.out.println("list:::::::::::::::::" + validList);
+            String operador = "<";
+            int posicion = 7-1;
+            int valor = 8;
+            
+            //reglaLongitud(operador, valor,posicion,validList1);
+            
+            String caracter = "CR";
+            int posicionCont=7-1;
+            //reglaContenido(caracter,posicionCont,validList1);
+            
+          int posicionDep1=12-1;
+          int posicionDep2=16-1;
+          String caracter1="SERAD";
+          String caracter2="MS";
+          
+          //reglaDependencia(posicionDep1,posicionDep2,caracter1,caracter2,validList1);
+          
+          int enteros=3;
+          int decimales=2;
+          int posicionDecimal=11-1;
+          
+          //pendiente
+          //reglasEnterosDecimales(enteros,decimales,posicionDecimal,validList1);
+          
+          
+          
+        }
     }
 
-    //metodo generar n listas para la validacion
+    private static void reglaLongitud(String operador, int valor, int posicion, List<String> validList1) {
+        
+        
+        if (operador.equals("<")) {
+            if(validList1.get(posicion).length()<valor){
+                System.out.println("Regla correcta longitud");
+            }else{
+                System.out.println("No cumple regla longitud");
+            }
+           
+        } else if (operador.equals(">")) {
+            if(validList1.get(posicion).length()>valor){
+                System.out.println("Regla correcta longitud");
+            }else{
+                System.out.println("No cumple regla longitud");
+            }
+           
+        } else if (operador.equals("=")) {
+            if(validList1.get(posicion).length()==valor){
+                System.out.println("Regla correcta longitud");
+            }else{
+                System.out.println("No cumple regla longitud");
+            }
+            
+        }
+    }
+
+    private static void reglaContenido(String caracter, int posicionCont, List<String> validList1) {
+        
+        if(validList1.get(posicionCont).equals(caracter)){
+            System.out.println("Regla de contenido exitosa");
+        }else{
+            System.out.println("no cumple la regla ");
+        }
+        
+        
+    }
+
+    private static void reglaDependencia(int posicionDep1, int posicionDep2, String caracter1, String caracter2, List<String> validList1) {
+      
+        if(validList1.get(posicionDep1).equals(caracter1)&& validList1.get(posicionDep2).equals(caracter2) ){
+             System.out.println("Regla exitosa");
+        }else{
+             System.out.println(validList1.get(posicionDep1)+"  El valor de esta columna no correcponde con el valor de.  "+validList1.get(posicionDep2));
+        }
+    }
+
+    private static void reglasEnterosDecimales(int enteros, int decimales, int posicionDecimal, List<String> validList1) {
+        System.out.println(validList1.get(posicionDecimal)+"::::: "); 
+   
+    }
+    
+    //Es necesario o solo 
+    private static int convierteDatoToPosicion(String dato) {
+        //System.out.println(HEADER_PRODUCT.indexOf(dato)+ "indexxxx");
+        int position=HEADER_PRODUCT.indexOf(dato);
+        return position;
+     }
+    
     public static List<String> generaLista() {
         return new ArrayList<String>();
     }
