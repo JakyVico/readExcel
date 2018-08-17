@@ -19,16 +19,23 @@ import javax.print.DocFlavor;
 import jdk.nashorn.internal.runtime.Version;
 import netscape.javascript.JSObject;
 import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_BLANK;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.util.ArrayUtil;
 
 /**
  *
  * @author VS1XFI7
  */
+//Probar con archivos que  en las celdas ocultas no estan llenas las tome bien 
+//
 public class LeerArch {
 
     String nameSheetTwo;
@@ -44,18 +51,19 @@ public class LeerArch {
     private static String tipoCargo, carcProd;
     private static List<String> validList;
     private static List<String> valoresAprovisionamiento;
-    private static int HEADER_READER = 12-1;
-    private static String NAME_SHEET="Planes";
-    
-    //private static int HEADER_READER = 10-1;
-    //private static String NAME_SHEET="Formato";
+    private static int HEADER_READER = 11 - 1;
+    private static String NAME_SHEET = "Planes";
+    private static   CellStyle style;
+   
 
+    // private static int HEADER_READER = 10-1;
+    //  private static String NAME_SHEET="Formato";
     public static void main(String[] args) {
         LeerArch readXls = new LeerArch();
         //readXls.readXLSFile("C:/Users/VS1XFI7/Desktop/JAQUE/Formatos/Planes/prubP.xls");
-        readXls.readXLSFile("C:/Users/VS1XFI7/Desktop/JAQUE/Formatos/Productos/prubP.xls");
-        //readXls.readXLSFile("C:/Users/VS1XFI7/Desktop/JAQUE/Formatos/Productos/validacionp.xls");
-        System.out.println("  Esto es el header"+HEADER_PRODUCT+"size"+HEADER_PRODUCT.size());
+        // readXls.readXLSFile("C:/Users/VS1XFI7/Desktop/JAQUE/Formatos/Productos/PRODUCTOS.xls");
+        readXls.readXLSFile("C:/Users/VS1XFI7/Desktop/JAQUE/Formatos/Planes/n.xls");
+        System.out.println("  Esto es el header" + HEADER_PRODUCT + "size" + HEADER_PRODUCT.size());
         //System.out.println(REGIONES + "regiones");
         //System.out.println(PRODUCTO + " productos");
         //System.out.println(NAMESHEET + " nombres");
@@ -91,14 +99,24 @@ public class LeerArch {
             HSSFRow row;
             HSSFCell cell;
             Iterator rows = sheet.rowIterator();
+      
+
             while (rows.hasNext()) {
+                 
                 row = (HSSFRow) rows.next();
                 Iterator cells = row.cellIterator();
+                int numCelda = 0;
                 while (cells.hasNext()) {
+                    //System.out.println(HEADER_PRODUCT+"aqui quedo el header");
+                   
                     cell = (HSSFCell) cells.next();
+                 
+              
                     //validaPlan(cell);
-                    prueba(cell);
-                    readFormat(cell);
+                    // prueba(cell);
+                   
+                    readFormat(cell, row,sheet);
+
                 }
                 try {
                     ExcelFileToRead.close();
@@ -110,52 +128,69 @@ public class LeerArch {
     }
 
     //metodo agrgar a las listas los headers 
-    public static void readFormat(HSSFCell cell) {
-
+    public static void readFormat(HSSFCell cell, HSSFRow row, HSSFSheet sheet) {
+        //System.out.println(cell.getCellStyle().getHidden() );
+      
         int fila = cell.getRowIndex();
         int colum = cell.getColumnIndex();
         
-       
+        //leer la primera hoja 
         if (NAMESHEET.size() == 1) {
             if (NAMESHEET.get(0).equalsIgnoreCase(NAME_SHEET)) {
+    
+                if (colum > HEADER_PRODUCT.size()) {
+
+                    //  System.err.println(colum+" "+HEADER_PRODUCT.size())
+                    validList = generaLista();
+                    return;
+
+                }
                 if (fila == HEADER_READER) {
                     validList = generaLista();
                     HEADER_PRODUCT.add(cell.getStringCellValue());
                 } else if (fila > HEADER_READER) {
                     if (validList.size() < HEADER_PRODUCT.size()) {
+                        // style.setBorderBottom(BorderStyle.MEDIUM);
                         if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-                           int i = (int) cell.getNumericCellValue();
-                           String temp = String.valueOf(i); 
-                           validList.add(temp);   
-                        } else  {
-                           validList.add(cell.getStringCellValue()); 
+                            String temp = String.valueOf(cell.getNumericCellValue());
+       
+                            
+                            validList.add(temp);
+                        } else if (cell.getCellType() == HSSFCell.CELL_TYPE_BOOLEAN) {
+                            String temp = String.valueOf(cell.getBooleanCellValue());
+                            validList.add(temp);
+                        } else {
+                            validList.add(cell.getStringCellValue());
                         }
                         // System.out.println(validList+"aaa"+validList.size());
-                        //validList.add(cell.getStringCellValue());
+                        // validList.add(cell.getStringCellValue());
                         // System.out.println("HEADER SIZEEE"+HEADER_PRODUCT.size());
                         // System.out.println("Daata"+validList.size());
                         //System.out.println("Daata" + validList + "SIZE  " + validList.size());
                     } else {
                         validaDatos(validList);
                         validList = generaLista();
+                          
                         if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-                            //System.out.println(cell.getStringCellValue() + "\t\t\t\t\t" + "Columna " + " " + cell.getColumnIndex() + " Fila: " + cell.getRowIndex());
-                           int i = (int) cell.getNumericCellValue();
-                           String temp = String.valueOf(i); 
-                           validList.add(temp);
-                    
-                        }else{
+                            String temp = String.valueOf(cell.getNumericCellValue());
+                            validList.add(temp);
+
+                        } else if (cell.getCellType() == HSSFCell.CELL_TYPE_BOOLEAN) {
+                            String temp = String.valueOf(cell.getBooleanCellValue());
+                            validList.add(temp);
+                        } else {
                             validList.add(cell.getStringCellValue());
-                            
-                            
+
                         }
-                         //System.out.println(validList+"bb"+validList.size());
+                        //System.out.println(validList+"bb"+validList.size());
 /*
                         validaDatos(validList);
                         validList = generaLista();
                         validList.add(cell.getStringCellValue());
-                        System.out.println("Daata" + validList + "SIZE  " + validList.size());*/
+                        //System.out.println("Daata" + validList + "SIZE  " + validList.size());*/
                     }
+                    //System.out.println("Daata" + validList + "SIZE  " + validList.size());
+
                 }
 
             }
@@ -165,23 +200,23 @@ public class LeerArch {
 
     private static void validaDatos(List<String> validList1) {
 
-       // System.out.println(validList1 + "  " + validList1.size());
-        String dato = "GRPPLN      X(20)";
+        System.out.println(validList1 + "  " + validList1.size());
+        String dato = "TIPO DE CUENTA X(20)";
         int position = convierteDatoToPosicion(dato);
-       // System.out.println(position+"posi");
-     
-        
+       // System.out.println(dato+":  " + validList1.get(position)+"");
+
+        // System.out.println(position+"posi");
         //System.err.println("header"+HEADER_PRODUCT);
         if (validList1.get(0).isEmpty()) {
             //  System.err.println("No tiene dato principal");
         } else {
-            //System.out.println("list:::::::::::::::::" + validList);
+            // System.out.println("list:::::::::::::::::" + validList);
             String operador = "<";
             int valor = 8;
 
             //reglaLongitud(operador, valor,position,validList1);
             String caracter = "N";
-             //reglaContenido(caracter,position,validList1);
+            //reglaContenido(caracter,position,validList1);
 
             int posicionDep1 = 12 - 1;
             int posicionDep2 = 16 - 1;
@@ -225,8 +260,8 @@ public class LeerArch {
     }
 
     private static void reglaContenido(String caracter, int posicionCont, List<String> validList1) {
-        
-        System.err.println(validList1.get(posicionCont)+"lalalal");
+
+        System.err.println(validList1.get(posicionCont) + "lalalal");
         if (validList1.get(posicionCont).equals(caracter)) {
             System.out.println("Regla de contenido exitosa" + validList1.get(posicionCont));
         } else {
@@ -253,7 +288,7 @@ public class LeerArch {
     private static int convierteDatoToPosicion(String dato) {
         //System.out.println(HEADER_PRODUCT.indexOf(dato)+ "indexxxx");
         int position = HEADER_PRODUCT.indexOf(dato);
-
+        // System.out.println(":::::::::::::::::::::"+position);
         return position;
     }
 
